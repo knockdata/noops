@@ -1,6 +1,6 @@
-FROM debian:jessie
+FROM java:8
 
-ENV BRANCH  branch-0.6
+ENV BRANCH v0.6.0
 
 ENV ZEPPELIN_PORT 8080
 ENV ZEPPELIN_HOME /usr/zeppelin
@@ -12,19 +12,19 @@ RUN apt-get update \
   && apt-get install -y git curl sed xmlstarlet
 
 # JAVA
-ARG JAVA_MAJOR_VERSION=8
-ARG JAVA_UPDATE_VERSION=102
-ARG JAVA_BUILD_NUMBER=14
-ENV JAVA_HOME /usr/jdk1.${JAVA_MAJOR_VERSION}.0_${JAVA_UPDATE_VERSION}
+#ARG JAVA_MAJOR_VERSION=8
+#ARG JAVA_UPDATE_VERSION=102
+#ARG JAVA_BUILD_NUMBER=14
+#ENV JAVA_HOME /usr/jdk1.${JAVA_MAJOR_VERSION}.0_${JAVA_UPDATE_VERSION}
 
-ENV PATH $PATH:$JAVA_HOME/bin
-RUN curl -sL --retry 3 --insecure \
-  --header "Cookie: oraclelicense=accept-securebackup-cookie;" \
-  "http://download.oracle.com/otn-pub/java/jdk/${JAVA_MAJOR_VERSION}u${JAVA_UPDATE_VERSION}-b${JAVA_BUILD_NUMBER}/server-jre-${JAVA_MAJOR_VERSION}u${JAVA_UPDATE_VERSION}-linux-x64.tar.gz" \
-  | gunzip \
-  | tar x -C /usr/ \
-  && ln -s $JAVA_HOME /usr/java \
-  && rm -rf $JAVA_HOME/man
+#ENV PATH $PATH:$JAVA_HOME/bin
+#RUN curl -sL --retry 3 --insecure \
+#  --header "Cookie: oraclelicense=accept-securebackup-cookie;" \
+#  "http://download.oracle.com/otn-pub/java/jdk/${JAVA_MAJOR_VERSION}u${JAVA_UPDATE_VERSION}-b${JAVA_BUILD_NUMBER}/server-jre-${JAVA_MAJOR_VERSION}u${JAVA_UPDATE_VERSION}-linux-x64.tar.gz" \
+#  | gunzip \
+#  | tar x -C /usr/ \
+#  && ln -s $JAVA_HOME /usr/java \
+#  && rm -rf $JAVA_HOME/man
 
 # Install Maven 3.3.0
 RUN curl -sL http://archive.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz \
@@ -61,7 +61,10 @@ RUN tar xvf /tmp/zeppelin/zeppelin-distribution/target/zeppelin*.tar.gz -C /usr/
 # Clean Env
 RUN apt-get purge -y --auto-remove git curl xmlstarlet \
   && rm -rf /tmp/* \
-  && rm -rf ~/.m2
+  && rm -rf ~/.m2 \
+  && rm -rf ~/.npm \
+  && rm -rf ~/.cache \
+  && apt-get clean
 
 WORKDIR $ZEPPELIN_HOME
 CMD ["bin/zeppelin.sh"]
